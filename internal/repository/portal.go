@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/anton1ks96/college-app-core/internal/domain"
 )
@@ -36,6 +37,17 @@ func (r *PortalRepository) FetchSchedule(req domain.ScheduleRequest) ([]domain.S
 	var events []domain.ScheduleEvent
 	if err := json.Unmarshal(data, &events); err != nil {
 		return nil, err
+	}
+
+	for i := 0; i < len(events); i++ {
+		if strings.Contains(events[i].Start, " ") {
+			parts := strings.Split(events[i].Start, " ")
+			events[i].Start = parts[len(parts)-1]
+		}
+		if strings.Contains(events[i].End, " ") {
+			parts := strings.Split(events[i].End, " ")
+			events[i].End = parts[len(parts)-1]
+		}
 	}
 
 	return events, nil

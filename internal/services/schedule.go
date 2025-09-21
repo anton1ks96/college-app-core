@@ -50,7 +50,12 @@ func (s *ScheduleService) GetSchedule(group, subgroup, start, end string) ([]dom
 
 	result := mergeByClIDPreferCommon(commonFiltered, subFiltered)
 
-	sort.Slice(result, func(i, j int) bool { return result[i].Start < result[j].Start })
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].Day != result[j].Day {
+			return result[i].Day < result[j].Day
+		}
+		return result[i].Start < result[j].Start
+	})
 
 	return result, nil
 }
