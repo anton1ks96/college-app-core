@@ -12,6 +12,7 @@ import (
 type (
 	Config struct {
 		Server Server
+		Portal Portal
 	}
 
 	Server struct {
@@ -20,6 +21,10 @@ type (
 		ReadTimeout    time.Duration
 		WriteTimeout   time.Duration
 		MaxHeaderBytes int
+	}
+
+	Portal struct {
+		URL string
 	}
 )
 

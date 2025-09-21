@@ -4,3 +4,6 @@ server:
   maxHeaderBytes: 1
   readTimeout: 30s
   writeTimeout: 30s
+
+portal:
+  url: "https://portal.it-college.ru"
