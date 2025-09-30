@@ -25,7 +25,7 @@ var profileSet = map[string]struct{}{
 	"BE": {}, "FE": {}, "GD": {}, "PM": {}, "SA": {}, "CD": {},
 }
 
-func (s *ScheduleService) GetSchedule(group, subgroup, start, end string) ([]domain.ScheduleEvent, error) {
+func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end string) ([]domain.ScheduleEvent, error) {
 	commonReq := domain.ScheduleRequest{
 		DStart: start, DEnd: end, Group: group, Subgroup: "*",
 	}
@@ -45,8 +45,8 @@ func (s *ScheduleService) GetSchedule(group, subgroup, start, end string) ([]dom
 		}
 	}
 
-	commonFiltered := filterEventsForSelection(commonEvents, subgroup)
-	subFiltered := filterEventsForSelection(subgroupEvents, subgroup)
+	commonFiltered := filterEventsForSelection(commonEvents, subgroup, englishGroup)
+	subFiltered := filterEventsForSelection(subgroupEvents, subgroup, englishGroup)
 
 	result := mergeByClIDPreferCommon(commonFiltered, subFiltered)
 
@@ -60,7 +60,7 @@ func (s *ScheduleService) GetSchedule(group, subgroup, start, end string) ([]dom
 	return result, nil
 }
 
-func filterEventsForSelection(events []domain.ScheduleEvent, subgroup string) []domain.ScheduleEvent {
+func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGroup string) []domain.ScheduleEvent {
 	if subgroup == "" || subgroup == "*" {
 		return events
 	}
@@ -81,7 +81,13 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup string) []
 				continue
 			}
 			if subgroupIsProfile && englishRe.MatchString(sg.SGrID) {
-				filtered = append(filtered, sg)
+				if englishGroup != "" && englishGroup != "*" {
+					if strings.EqualFold(sg.SGrID, englishGroup) {
+						filtered = append(filtered, sg)
+					}
+				} else {
+					filtered = append(filtered, sg)
+				}
 				continue
 			}
 		}

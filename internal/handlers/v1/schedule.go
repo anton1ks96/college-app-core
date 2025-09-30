@@ -21,6 +21,7 @@ func NewScheduleHandler(svc *services.ScheduleService) *ScheduleHandler {
 func (h *ScheduleHandler) GetSchedule(c *gin.Context) {
 	group := c.Query("group")
 	subgroup := c.Query("subgroup")
+	englishGroup := c.Query("english_group")
 	start := c.Query("start")
 	end := c.Query("end")
 
@@ -29,7 +30,7 @@ func (h *ScheduleHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	events, err := h.scheduleService.GetSchedule(group, subgroup, start, end)
+	events, err := h.scheduleService.GetSchedule(group, subgroup, englishGroup, start, end)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
