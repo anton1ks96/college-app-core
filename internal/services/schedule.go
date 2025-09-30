@@ -50,6 +50,22 @@ func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end 
 
 	result := mergeByClIDPreferCommon(commonFiltered, subFiltered)
 
+	for i := range result {
+		if len(result[i].SubGroup) == 1 {
+			sg := result[i].SubGroup[0]
+			if result[i].Topic == "" {
+				result[i].Topic = sg.STopic
+			}
+			if result[i].Title == "" || result[i].Title == sg.STitle {
+				result[i].Title = sg.STitle
+			}
+			if result[i].Room == "" {
+				result[i].Room = sg.SGCaID
+			}
+			result[i].SubGroup = nil
+		}
+	}
+
 	sort.Slice(result, func(i, j int) bool {
 		if result[i].Day != result[j].Day {
 			return result[i].Day < result[j].Day
