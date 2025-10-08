@@ -20,6 +20,7 @@ FROM alpine:3.20
 
 WORKDIR /app
 
+COPY --from=builder /app/configs ./configs
 COPY --from=builder /app/core-app ./core-app
 
 EXPOSE 8500

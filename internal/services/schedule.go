@@ -98,7 +98,9 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 				continue
 			}
 			if englishRe.MatchString(sg.SGrID) {
-				if englishGroup != "" && englishGroup != "*" {
+				if englishGroup == "*" {
+					filtered = append(filtered, sg)
+				} else if englishGroup != "" {
 					if strings.EqualFold(sg.SGrID, englishGroup) {
 						filtered = append(filtered, sg)
 					}
