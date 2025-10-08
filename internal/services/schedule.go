@@ -82,7 +82,6 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 		return events
 	}
 
-	_, subgroupIsProfile := profileSet[strings.ToUpper(subgroup)]
 	out := make([]domain.ScheduleEvent, 0, len(events))
 
 	for _, ev := range events {
@@ -98,14 +97,12 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 				continue
 			}
 			if englishRe.MatchString(sg.SGrID) {
-				if englishGroup == "*" {
+				if englishGroup == "*" || englishGroup == "" {
 					filtered = append(filtered, sg)
-				} else if englishGroup != "" {
+				} else {
 					if strings.EqualFold(sg.SGrID, englishGroup) {
 						filtered = append(filtered, sg)
 					}
-				} else if subgroupIsProfile {
-					filtered = append(filtered, sg)
 				}
 				continue
 			}
