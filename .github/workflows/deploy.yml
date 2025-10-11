@@ -1,8 +1,9 @@
+---
 name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   docker-deploy:
@@ -40,5 +41,4 @@ jobs:
               --name core-app \
               --restart always \
               -p 0.0.0.0:8500:8500 \
-#              --env-file /root/env/core-app.env \
               anton1ks/college-core-app:latest
