@@ -89,7 +89,7 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 
 		filtered := ev.SubGroup[:0]
 		for _, sg := range ev.SubGroup {
-			if strings.EqualFold(sg.SGrID, "ФизраКол") {
+			if strings.EqualFold(sg.SGrID, "ФизраКол") || strings.EqualFold(sg.SGrID, "БрайтФит") {
 				filtered = append(filtered, sg)
 				continue
 			}
