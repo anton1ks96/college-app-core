@@ -21,9 +21,6 @@ func NewScheduleService(portal *repository.PortalRepository) *ScheduleService {
 }
 
 var englishRe = regexp.MustCompile(`^(A0|A1|A2|B1)\.\d{2}$`)
-var profileSet = map[string]struct{}{
-	"BE": {}, "FE": {}, "GD": {}, "PM": {}, "SA": {}, "CD": {},
-}
 
 func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end string) ([]domain.ScheduleEvent, error) {
 	commonReq := domain.ScheduleRequest{
@@ -92,6 +89,10 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 
 		filtered := ev.SubGroup[:0]
 		for _, sg := range ev.SubGroup {
+			if strings.EqualFold(sg.SGrID, "ФизраКол") {
+				filtered = append(filtered, sg)
+				continue
+			}
 			if strings.EqualFold(sg.SGrID, subgroup) {
 				filtered = append(filtered, sg)
 				continue
