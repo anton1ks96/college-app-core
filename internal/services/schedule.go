@@ -22,7 +22,7 @@ func NewScheduleService(portal *repository.PortalRepository) *ScheduleService {
 
 var englishRe = regexp.MustCompile(`^(A0|A1|A2|B1)\.\d{2}$`)
 
-func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end string) ([]domain.ScheduleEvent, error) {
+func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, profileSubgroup, start, end string) ([]domain.ScheduleEvent, error) {
 	commonReq := domain.ScheduleRequest{
 		DStart: start, DEnd: end, Group: group, Subgroup: "*",
 	}
@@ -42,8 +42,8 @@ func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end 
 		}
 	}
 
-	commonFiltered := filterEventsForSelection(commonEvents, subgroup, englishGroup)
-	subFiltered := filterEventsForSelection(subgroupEvents, subgroup, englishGroup)
+	commonFiltered := filterEventsForSelection(commonEvents, subgroup, englishGroup, profileSubgroup)
+	subFiltered := filterEventsForSelection(subgroupEvents, subgroup, englishGroup, profileSubgroup)
 
 	result := mergeByClIDPreferCommon(commonFiltered, subFiltered)
 
@@ -74,7 +74,7 @@ func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, start, end 
 	return result, nil
 }
 
-func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGroup string) []domain.ScheduleEvent {
+func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGroup, profileSubgroup string) []domain.ScheduleEvent {
 	if subgroup == "" || subgroup == "*" {
 		return events
 	}
@@ -102,6 +102,16 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 					filtered = append(filtered, sg)
 				} else {
 					if strings.EqualFold(sg.SGrID, englishGroup) {
+						filtered = append(filtered, sg)
+					}
+				}
+				continue
+			}
+			if strings.HasPrefix(sg.SGrID, "Подгр") {
+				if profileSubgroup == "" || profileSubgroup == "*" || strings.EqualFold(profileSubgroup, "Все") {
+					filtered = append(filtered, sg)
+				} else {
+					if strings.EqualFold(sg.SGrID, profileSubgroup) {
 						filtered = append(filtered, sg)
 					}
 				}
