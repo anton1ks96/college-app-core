@@ -108,10 +108,17 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 				continue
 			}
 			if strings.HasPrefix(sg.SGrID, "Подгр") {
-				if profileSubgroup == "" || profileSubgroup == "*" || strings.EqualFold(profileSubgroup, "Все") {
+				var mainSubgroup string
+				if strings.HasPrefix(subgroup, "Подгр") {
+					mainSubgroup = subgroup
+				} else {
+					mainSubgroup = profileSubgroup
+				}
+
+				if mainSubgroup == "" || mainSubgroup == "*" || strings.EqualFold(mainSubgroup, "Все") {
 					filtered = append(filtered, sg)
 				} else {
-					if strings.EqualFold(sg.SGrID, profileSubgroup) {
+					if strings.EqualFold(sg.SGrID, mainSubgroup) {
 						filtered = append(filtered, sg)
 					}
 				}
