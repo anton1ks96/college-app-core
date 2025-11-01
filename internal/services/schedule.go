@@ -23,29 +23,15 @@ func NewScheduleService(portal *repository.PortalRepository) *ScheduleService {
 var englishRe = regexp.MustCompile(`^(A0|A1|A2|B1)\.\d{2}$`)
 
 func (s *ScheduleService) GetSchedule(group, subgroup, englishGroup, profileSubgroup, start, end string) ([]domain.ScheduleEvent, error) {
-	commonReq := domain.ScheduleRequest{
+	req := domain.ScheduleRequest{
 		DStart: start, DEnd: end, Group: group, Subgroup: "*",
 	}
-	commonEvents, err := s.portal.FetchSchedule(commonReq)
+	events, err := s.portal.FetchSchedule(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch common schedule: %w", err)
+		return nil, fmt.Errorf("failed to fetch schedule: %w", err)
 	}
 
-	var subgroupEvents []domain.ScheduleEvent
-	if subgroup != "" && subgroup != "*" {
-		subReq := domain.ScheduleRequest{
-			DStart: start, DEnd: end, Group: group, Subgroup: subgroup,
-		}
-		subgroupEvents, err = s.portal.FetchSchedule(subReq)
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch subgroup schedule: %w", err)
-		}
-	}
-
-	commonFiltered := filterEventsForSelection(commonEvents, subgroup, englishGroup, profileSubgroup)
-	subFiltered := filterEventsForSelection(subgroupEvents, subgroup, englishGroup, profileSubgroup)
-
-	result := mergeByClIDPreferCommon(commonFiltered, subFiltered)
+	result := filterEventsForSelection(events, subgroup, englishGroup, profileSubgroup)
 
 	if subgroup != "" && subgroup != "*" {
 		for i := range result {
@@ -135,26 +121,6 @@ func filterEventsForSelection(events []domain.ScheduleEvent, subgroup, englishGr
 	}
 
 	return out
-}
-
-func mergeByClIDPreferCommon(common, sub []domain.ScheduleEvent) []domain.ScheduleEvent {
-	byClID := make(map[string]domain.ScheduleEvent, len(common))
-	result := make([]domain.ScheduleEvent, 0, len(common)+len(sub))
-
-	for _, ev := range common {
-		if _, ok := byClID[ev.ClID]; !ok {
-			byClID[ev.ClID] = ev
-			result = append(result, ev)
-		}
-	}
-	for _, ev := range sub {
-		if _, ok := byClID[ev.ClID]; ok {
-			continue
-		}
-		byClID[ev.ClID] = ev
-		result = append(result, ev)
-	}
-	return result
 }
 
 func (s *ScheduleService) GetClassDetails(clid string) (map[string]any, error) {
