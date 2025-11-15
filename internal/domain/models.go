@@ -1,5 +1,14 @@
 package domain
 
+type User struct {
+	ID            string `json:"id"`
+	Username      string `json:"username"`
+	Role          string `json:"role"`
+	AcademicGroup string `json:"academic_group"`
+	Profile       string `json:"profile"`
+	EnglishGroup  string `json:"english_group"`
+}
+
 type SubGroup struct {
 	SClID  string `json:"SClID"`
 	SGrID  string `json:"SGrID"`

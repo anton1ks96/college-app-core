@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/anton1ks96/college-app-core/internal/config"
+	"github.com/anton1ks96/college-app-core/internal/httpmw"
 	"github.com/anton1ks96/college-app-core/internal/repository"
 	"github.com/anton1ks96/college-app-core/internal/services"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,7 @@ import (
 type Handler struct {
 	cfg      *config.Config
 	schedule *ScheduleHandler
+	auth     gin.HandlerFunc
 }
 
 func NewHandler(cfg *config.Config) *Handler {
@@ -17,9 +19,12 @@ func NewHandler(cfg *config.Config) *Handler {
 	scheduleService := services.NewScheduleService(portalRepo)
 	scheduleHandler := NewScheduleHandler(scheduleService)
 
+	authMiddleware := httpmw.NewAuthMiddleware(cfg.Auth.ServiceURL, cfg.Auth.Timeout)
+
 	return &Handler{
 		cfg:      cfg,
 		schedule: scheduleHandler,
+		auth:     authMiddleware.ValidateToken(),
 	}
 }
 

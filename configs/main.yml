@@ -7,3 +7,7 @@ server:
 
 portal:
   url: "https://portal.it-college.ru"
+
+auth:
+  serviceURL: ""
+  timeout: 5s
