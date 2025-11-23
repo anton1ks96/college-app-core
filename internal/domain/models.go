@@ -67,3 +67,23 @@ type AttendanceRecord struct {
 	Type     string               `json:"type,omitempty"`
 	SubGroup []AttendanceSubGroup `json:"SubGroup,omitempty"`
 }
+
+type PerformanceSubject struct {
+	SuIDcrc string `json:"SuIDcrc"`
+	SuID    string `json:"SuID"`
+	Title   string `json:"Title"`
+}
+
+type PerformanceScoreRequest struct {
+	SuID      string `json:"SuID"`
+	Datastart string `json:"datastart"`
+	Dataend   string `json:"dataend"`
+}
+
+type PerformanceScore struct {
+	DateF       string `json:"DateF"`
+	DateP       string `json:"DateP"`
+	Score       string `json:"Score"`
+	MaxScore    int    `json:"MaxScore"`
+	Description string `json:"Description"`
+}
