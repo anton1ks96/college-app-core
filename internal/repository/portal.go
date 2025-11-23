@@ -12,14 +12,16 @@ import (
 )
 
 type PortalRepository struct {
-	client  *http.Client
-	baseURL string
+	client        *http.Client
+	baseURL       string
+	attendanceURL string
 }
 
-func NewPortalRepository(baseURL string) *PortalRepository {
+func NewPortalRepository(baseURL, attendanceURL string) *PortalRepository {
 	return &PortalRepository{
-		client:  &http.Client{},
-		baseURL: baseURL,
+		client:        &http.Client{},
+		baseURL:       baseURL,
+		attendanceURL: attendanceURL,
 	}
 }
 
@@ -69,4 +71,33 @@ func (r *PortalRepository) FetchClassDetails(clid string) (map[string]any, error
 		return nil, err
 	}
 	return details, nil
+}
+
+func (r *PortalRepository) FetchAttendance(login string, req domain.AttendanceRequest) ([]domain.AttendanceRecord, error) {
+
+	body, _ := json.Marshal(req)
+
+	httpReq, err := http.NewRequest("POST", r.attendanceURL, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	cookieValue := fmt.Sprintf("STDNT-login-user=%s", login)
+	httpReq.Header.Set("Cookie", fmt.Sprintf("session=%s", cookieValue))
+
+	resp, err := r.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, _ := io.ReadAll(resp.Body)
+
+	var records []domain.AttendanceRecord
+	if err := json.Unmarshal(data, &records); err != nil {
+		return nil, err
+	}
+
+	return records, nil
 }

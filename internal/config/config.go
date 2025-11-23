@@ -13,6 +13,7 @@ type (
 	Config struct {
 		Server Server
 		Portal Portal
+		Auth   Auth
 	}
 
 	Server struct {
@@ -24,7 +25,13 @@ type (
 	}
 
 	Portal struct {
-		URL string
+		URL           string
+		AttendanceURL string
+	}
+
+	Auth struct {
+		ServiceURL string
+		Timeout    time.Duration
 	}
 )
 
@@ -52,6 +59,11 @@ func parseConfigFile(folder string) error {
 	viper.AddConfigPath(folder)
 	viper.SetConfigName("main")
 	viper.SetConfigType("yml")
+
+	viper.AutomaticEnv()
+
+	viper.BindEnv("auth.serviceurl", "AUTH_SERVICE_URL")
+	viper.BindEnv("portal.attendanceurl", "PORTAL_ATTENDANCE_URL")
 
 	return viper.ReadInConfig()
 }
