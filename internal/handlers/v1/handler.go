@@ -9,16 +9,19 @@ import (
 )
 
 type Handler struct {
-	cfg        *config.Config
-	schedule   *ScheduleHandler
-	attendance *AttendanceHandler
-	auth       gin.HandlerFunc
+	cfg         *config.Config
+	schedule    *ScheduleHandler
+	attendance  *AttendanceHandler
+	performance *PerformanceHandler
+	auth        gin.HandlerFunc
 }
 
 func NewHandler(cfg *config.Config) *Handler {
 	portalRepo := repository.NewPortalRepository(
 		cfg.Portal.URL,
 		cfg.Portal.AttendanceURL,
+		cfg.Portal.PerformanceSubjectsURL,
+		cfg.Portal.PerformanceScoreURL,
 	)
 	scheduleService := services.NewScheduleService(portalRepo)
 	scheduleHandler := NewScheduleHandler(scheduleService)
@@ -26,13 +29,17 @@ func NewHandler(cfg *config.Config) *Handler {
 	attendanceService := services.NewAttendanceService(portalRepo)
 	attendanceHandler := NewAttendanceHandler(attendanceService)
 
+	performanceService := services.NewPerformanceService(portalRepo)
+	performanceHandler := NewPerformanceHandler(performanceService)
+
 	authMiddleware := httpmw.NewAuthMiddleware(cfg.Auth.ServiceURL, cfg.Auth.Timeout)
 
 	return &Handler{
-		cfg:        cfg,
-		schedule:   scheduleHandler,
-		attendance: attendanceHandler,
-		auth:       authMiddleware.ValidateToken(),
+		cfg:         cfg,
+		schedule:    scheduleHandler,
+		attendance:  attendanceHandler,
+		performance: performanceHandler,
+		auth:        authMiddleware.ValidateToken(),
 	}
 }
 
@@ -40,4 +47,10 @@ func (h *Handler) Init(api *gin.RouterGroup) {
 	api.GET("/schedule", h.schedule.GetSchedule)
 	api.GET("/classdetails", h.schedule.GetClassDetails)
 	api.GET("/attendance", h.auth, h.attendance.GetAttendance)
+
+	performance := api.Group("/performance")
+	{
+		performance.GET("/subjects", h.auth, h.performance.GetSubjects)
+		performance.POST("/score", h.auth, h.performance.GetScore)
+	}
 }

@@ -12,16 +12,20 @@ import (
 )
 
 type PortalRepository struct {
-	client        *http.Client
-	baseURL       string
-	attendanceURL string
+	client                  *http.Client
+	baseURL                 string
+	attendanceURL           string
+	performanceSubjectsURL  string
+	performanceScoreURL     string
 }
 
-func NewPortalRepository(baseURL, attendanceURL string) *PortalRepository {
+func NewPortalRepository(baseURL, attendanceURL, performanceSubjectsURL, performanceScoreURL string) *PortalRepository {
 	return &PortalRepository{
-		client:        &http.Client{},
-		baseURL:       baseURL,
-		attendanceURL: attendanceURL,
+		client:                  &http.Client{},
+		baseURL:                 baseURL,
+		attendanceURL:           attendanceURL,
+		performanceSubjectsURL:  performanceSubjectsURL,
+		performanceScoreURL:     performanceScoreURL,
 	}
 }
 
@@ -100,4 +104,57 @@ func (r *PortalRepository) FetchAttendance(login string, req domain.AttendanceRe
 	}
 
 	return records, nil
+}
+
+func (r *PortalRepository) FetchPerformanceSubjects(login string) ([]domain.PerformanceSubject, error) {
+	httpReq, err := http.NewRequest("GET", r.performanceSubjectsURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	cookieValue := fmt.Sprintf("STDNT-login-user=%s", login)
+	httpReq.Header.Set("Cookie", fmt.Sprintf("session=%s", cookieValue))
+
+	resp, err := r.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, _ := io.ReadAll(resp.Body)
+
+	var subjects []domain.PerformanceSubject
+	if err := json.Unmarshal(data, &subjects); err != nil {
+		return nil, err
+	}
+
+	return subjects, nil
+}
+
+func (r *PortalRepository) FetchPerformanceScore(login string, req domain.PerformanceScoreRequest) (map[string]map[string][]domain.PerformanceScore, error) {
+	body, _ := json.Marshal(req)
+
+	httpReq, err := http.NewRequest("POST", r.performanceScoreURL, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	cookieValue := fmt.Sprintf("STDNT-login-user=%s", login)
+	httpReq.Header.Set("Cookie", fmt.Sprintf("session=%s", cookieValue))
+
+	resp, err := r.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, _ := io.ReadAll(resp.Body)
+
+	var scores map[string]map[string][]domain.PerformanceScore
+	if err := json.Unmarshal(data, &scores); err != nil {
+		return nil, err
+	}
+
+	return scores, nil
 }
