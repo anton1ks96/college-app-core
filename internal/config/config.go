@@ -25,7 +25,8 @@ type (
 	}
 
 	Portal struct {
-		URL string
+		URL           string
+		AttendanceURL string
 	}
 
 	Auth struct {
@@ -62,6 +63,7 @@ func parseConfigFile(folder string) error {
 	viper.AutomaticEnv()
 
 	viper.BindEnv("auth.serviceurl", "AUTH_SERVICE_URL")
+	viper.BindEnv("portal.attendanceurl", "PORTAL_ATTENDANCE_URL")
 
 	return viper.ReadInConfig()
 }

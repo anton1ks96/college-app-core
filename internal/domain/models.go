@@ -41,3 +41,29 @@ type ScheduleRequest struct {
 type ScheduleResponse struct {
 	Events []ScheduleEvent `json:"events"`
 }
+
+type AttendanceRequest struct {
+	DStart string `json:"d_start"`
+	DEnd   string `json:"d_end"`
+}
+
+type AttendanceSubGroup struct {
+	SClID  int    `json:"SClID"`
+	SCaID  string `json:"SCaID"`
+	STopic string `json:"STopic"`
+	STitle string `json:"STitle"`
+}
+
+type AttendanceRecord struct {
+	ClID     int                  `json:"ClID"`
+	Day      string               `json:"Day"`
+	Topic    string               `json:"topic"`
+	Start    string               `json:"start"`
+	End      string               `json:"end"`
+	Room     string               `json:"room"`
+	Status   int                  `json:"status"`
+	Title    string               `json:"title"`
+	Color    string               `json:"color"`
+	Type     string               `json:"type,omitempty"`
+	SubGroup []AttendanceSubGroup `json:"SubGroup,omitempty"`
+}

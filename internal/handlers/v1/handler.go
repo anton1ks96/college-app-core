@@ -9,26 +9,35 @@ import (
 )
 
 type Handler struct {
-	cfg      *config.Config
-	schedule *ScheduleHandler
-	auth     gin.HandlerFunc
+	cfg        *config.Config
+	schedule   *ScheduleHandler
+	attendance *AttendanceHandler
+	auth       gin.HandlerFunc
 }
 
 func NewHandler(cfg *config.Config) *Handler {
-	portalRepo := repository.NewPortalRepository(cfg.Portal.URL)
+	portalRepo := repository.NewPortalRepository(
+		cfg.Portal.URL,
+		cfg.Portal.AttendanceURL,
+	)
 	scheduleService := services.NewScheduleService(portalRepo)
 	scheduleHandler := NewScheduleHandler(scheduleService)
+
+	attendanceService := services.NewAttendanceService(portalRepo)
+	attendanceHandler := NewAttendanceHandler(attendanceService)
 
 	authMiddleware := httpmw.NewAuthMiddleware(cfg.Auth.ServiceURL, cfg.Auth.Timeout)
 
 	return &Handler{
-		cfg:      cfg,
-		schedule: scheduleHandler,
-		auth:     authMiddleware.ValidateToken(),
+		cfg:        cfg,
+		schedule:   scheduleHandler,
+		attendance: attendanceHandler,
+		auth:       authMiddleware.ValidateToken(),
 	}
 }
 
 func (h *Handler) Init(api *gin.RouterGroup) {
 	api.GET("/schedule", h.schedule.GetSchedule)
 	api.GET("/classdetails", h.schedule.GetClassDetails)
+	api.GET("/attendance", h.auth, h.attendance.GetAttendance)
 }

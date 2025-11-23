@@ -7,6 +7,7 @@ server:
 
 portal:
   url: "https://portal.it-college.ru"
+  attendanceURL: ""
 
 auth:
   serviceURL: ""
