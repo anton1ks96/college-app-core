@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,27 +13,31 @@ import (
 )
 
 type PortalRepository struct {
-	client                  *http.Client
-	baseURL                 string
-	attendanceURL           string
-	performanceSubjectsURL  string
-	performanceScoreURL     string
+	client                 *http.Client
+	baseURL                string
+	attendanceURL          string
+	performanceSubjectsURL string
+	performanceScoreURL    string
 }
 
 func NewPortalRepository(baseURL, attendanceURL, performanceSubjectsURL, performanceScoreURL string) *PortalRepository {
 	return &PortalRepository{
-		client:                  &http.Client{},
-		baseURL:                 baseURL,
-		attendanceURL:           attendanceURL,
-		performanceSubjectsURL:  performanceSubjectsURL,
-		performanceScoreURL:     performanceScoreURL,
+		client: &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		},
+		baseURL:                baseURL,
+		attendanceURL:          attendanceURL,
+		performanceSubjectsURL: performanceSubjectsURL,
+		performanceScoreURL:    performanceScoreURL,
 	}
 }
 
 func (r *PortalRepository) FetchSchedule(req domain.ScheduleRequest) ([]domain.ScheduleEvent, error) {
 	body, _ := json.Marshal(req)
 
-	resp, err := r.client.Post(fmt.Sprintf("%s/schedule25.php", r.baseURL), "application/json", bytes.NewReader(body))
+	resp, err := r.client.Post(fmt.Sprintf("%s/Services/schedule25.php", r.baseURL), "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +67,7 @@ func (r *PortalRepository) FetchSchedule(req domain.ScheduleRequest) ([]domain.S
 func (r *PortalRepository) FetchClassDetails(clid string) (map[string]any, error) {
 	body, _ := json.Marshal(map[string]string{"clid": clid})
 
-	resp, err := r.client.Post(fmt.Sprintf("%s/classdetails25.php", r.baseURL), "application/json", bytes.NewReader(body))
+	resp, err := r.client.Post(fmt.Sprintf("%s/Services/classdetails25.php", r.baseURL), "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}

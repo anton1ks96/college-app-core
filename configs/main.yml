@@ -6,7 +6,7 @@ server:
   writeTimeout: 30s
 
 portal:
-  url: "https://portal.it-college.ru"
+  url: "https://portal.students.it-college.ru"
   attendanceURL: ""
 
 auth:
