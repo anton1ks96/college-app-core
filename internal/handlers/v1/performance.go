@@ -5,6 +5,7 @@ import (
 
 	"github.com/anton1ks96/college-app-core/internal/httpmw"
 	"github.com/anton1ks96/college-app-core/internal/services"
+	"github.com/anton1ks96/college-app-core/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,10 @@ func (h *PerformanceHandler) GetSubjects(c *gin.Context) {
 
 	subjects, err := h.performanceService.GetSubjects(login)
 	if err != nil {
+		logger.Logger.Error().
+			Err(err).
+			Str("login", login).
+			Msg("failed to get performance subjects")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -52,6 +57,13 @@ func (h *PerformanceHandler) GetScore(c *gin.Context) {
 
 	scores, err := h.performanceService.GetScore(login, req.SuID, req.Datastart, req.Dataend)
 	if err != nil {
+		logger.Logger.Error().
+			Err(err).
+			Str("login", login).
+			Str("suID", req.SuID).
+			Str("datastart", req.Datastart).
+			Str("dataend", req.Dataend).
+			Msg("failed to get performance score")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

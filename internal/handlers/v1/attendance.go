@@ -5,6 +5,7 @@ import (
 
 	"github.com/anton1ks96/college-app-core/internal/httpmw"
 	"github.com/anton1ks96/college-app-core/internal/services"
+	"github.com/anton1ks96/college-app-core/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +32,12 @@ func (h *AttendanceHandler) GetAttendance(c *gin.Context) {
 
 	records, err := h.attendanceService.GetAttendance(login, start, end)
 	if err != nil {
+		logger.Logger.Error().
+			Err(err).
+			Str("login", login).
+			Str("start", start).
+			Str("end", end).
+			Msg("failed to get attendance")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
