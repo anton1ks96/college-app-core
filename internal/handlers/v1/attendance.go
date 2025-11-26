@@ -44,3 +44,19 @@ func (h *AttendanceHandler) GetAttendance(c *gin.Context) {
 
 	c.JSON(http.StatusOK, records)
 }
+
+func (h *AttendanceHandler) GetAttendanceStreak(c *gin.Context) {
+	login, _ := httpmw.GetUserID(c)
+
+	streak, err := h.attendanceService.GetAttendanceStreak(login)
+	if err != nil {
+		logger.Logger.Error().
+			Err(err).
+			Str("login", login).
+			Msg("failed to get attendance streak")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, streak)
+}
