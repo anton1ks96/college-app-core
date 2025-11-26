@@ -87,3 +87,14 @@ type PerformanceScore struct {
 	MaxScore    int    `json:"MaxScore"`
 	Description string `json:"Description"`
 }
+
+type StreakResponse struct {
+	CurrentStreak     int     `json:"current_streak"`
+	LongestStreak     int     `json:"longest_streak"`
+	TotalDaysAttended int     `json:"total_days_attended"`
+	TotalSchoolDays   int     `json:"total_school_days"`
+	AttendanceRate    float64 `json:"attendance_rate"`
+	LastAttendedDate  string  `json:"last_attended_date,omitempty"`
+	PeriodStart       string  `json:"period_start"`
+	PeriodEnd         string  `json:"period_end"`
+}

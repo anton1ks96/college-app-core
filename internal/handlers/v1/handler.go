@@ -47,6 +47,7 @@ func (h *Handler) Init(api *gin.RouterGroup) {
 	api.GET("/schedule", h.schedule.GetSchedule)
 	api.GET("/classdetails", h.schedule.GetClassDetails)
 	api.GET("/attendance", h.auth, h.attendance.GetAttendance)
+	api.GET("/attendance/streak", h.auth, h.attendance.GetAttendanceStreak)
 
 	performance := api.Group("/performance")
 	{
