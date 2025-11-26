@@ -156,6 +156,10 @@ func (r *PortalRepository) FetchPerformanceScore(login string, req domain.Perfor
 
 	data, _ := io.ReadAll(resp.Body)
 
+	if string(bytes.TrimSpace(data)) == "[]" {
+		return make(map[string]map[string][]domain.PerformanceScore), nil
+	}
+
 	var scores map[string]map[string][]domain.PerformanceScore
 	if err := json.Unmarshal(data, &scores); err != nil {
 		return nil, err
