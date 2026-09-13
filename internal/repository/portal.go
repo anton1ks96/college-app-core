@@ -37,7 +37,7 @@ func NewPortalRepository(baseURL, attendanceURL, performanceSubjectsURL, perform
 func (r *PortalRepository) FetchSchedule(req domain.ScheduleRequest) ([]domain.ScheduleEvent, error) {
 	body, _ := json.Marshal(req)
 
-	resp, err := r.client.Post(fmt.Sprintf("%s/Services/schedule25.php", r.baseURL), "application/json", bytes.NewReader(body))
+	resp, err := r.client.Post(fmt.Sprintf("%s/Services/schedule26.php", r.baseURL), "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
