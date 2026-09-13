@@ -8,6 +8,11 @@ import (
 	"github.com/anton1ks96/college-app-core/internal/domain"
 )
 
+const (
+	attendanceStatusExcused = 1
+	attendanceStatusPresent = 2
+)
+
 func (s *AttendanceService) GetAttendanceStreak(login string) (*domain.StreakResponse, error) {
 	startDate := getAcademicYearStart()
 	endDate := getToday()
@@ -63,11 +68,14 @@ func (s *AttendanceService) groupByDayAndDetermineStatus(records []domain.Attend
 	dayStatus := make(map[string]bool)
 
 	for _, r := range records {
+		if r.Status == attendanceStatusExcused {
+			continue
+		}
 		day := r.Day
 		if dayStatus[day] {
 			continue
 		}
-		if r.Status == 2 {
+		if r.Status == attendanceStatusPresent {
 			dayStatus[day] = true
 		} else if _, exists := dayStatus[day]; !exists {
 			dayStatus[day] = false
